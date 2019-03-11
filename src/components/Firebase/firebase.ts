@@ -9,10 +9,17 @@ const config = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
 };
 
-class Firebase {
-  constructor(config) {
+export interface IFirebase {}
+class Firebase implements IFirebase{
+  constructor() {
     app.initializeApp(config);
   }
 }
+
+// class Firebase {
+//   constructor() {
+//     app.initializeApp(config);
+//   }
+// }
 
 export default Firebase;
