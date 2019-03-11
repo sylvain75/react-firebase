@@ -10,7 +10,7 @@ const config = {
 };
 
 class Firebase {
-  constructor() {
+  constructor(config) {
     app.initializeApp(config);
   }
 }
