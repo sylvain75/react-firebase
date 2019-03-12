@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
@@ -29,95 +29,82 @@ const INITIAL_STATE: State = {
   error: Error,
 };
 
-class SignUpFormBase extends Component<any, State> {
-  constructor(props: any) {
-    super(props);
-    this.state = { ...INITIAL_STATE };
-  }
-
-  onSubmit = (event: React.SyntheticEvent) => {
-    const { username, email, passwordOne } = this.state;
-
-    this.props.firebase
+const SignUpFormBase = (props: any) => {
+  const [username, onChangeUsername] = useState("");
+  const [email, onChangeEmail] = useState("");
+  const [passwordOne, onChangePasswordOne] = useState("");
+  const [passwordTwo, onChangePasswordTwo] = useState("");
+  const [error, setError] = useState<Error | null>(null);
+  const [initialState, resetState] = useState();
+  const onSubmit = (event: React.SyntheticEvent) => {
+    props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser: any) => {
         console.log('authUser HERE', authUser);
-        this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.HOME);
+        resetState(INITIAL_STATE);
+        console.log('onChangeEmail HERE',initialState, email);
+        props.history.push(ROUTES.HOME);
       })
       .catch((error: Error) => {
-        this.setState({ error });
+        setError(error);
       });
 
     event.preventDefault();
   };
-
-
-  onChange = (event: React.SyntheticEvent): void => {
-    // event type: https://stackoverflow.com/a/42084103/5110929
-    let target = event.target as HTMLInputElement;
-    this.setState({ [target.name]: target.value } as Pick<
-      State,
-      any
-      >);
-    /* INFO typescript error before without as Pick<State, any>
-      handling with as Pick ... means we pick only ModalStateName enum out of  the whole IState keys
-      Casting to type Pick to avoid a typing error. It was arising because the state type we were trying to set didn’t include any of the properties as required because the compiler interprets the argument as a string type.
-   */
-  };
-
-  render() {
-    const {
-      username,
-      email,
-      passwordOne,
-      passwordTwo,
-      error,
-    } = this.state;
-    const isInvalid: boolean =
-      passwordOne !== passwordTwo ||
-      passwordOne === '' ||
-      email === '' ||
-      username === '';
-
-    return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="username"
-          value={username}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Full Name"
-        />
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="passwordOne"
-          value={passwordOne}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <input
-          name="passwordTwo"
-          value={passwordTwo}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Confirm Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign Up
-        </button>
-        {error && <p>{error.message}</p>}
-      </form>
-    );
-  }
-}
+  const isInvalid: boolean =
+    passwordOne !== passwordTwo ||
+    passwordOne === '' ||
+    email === '' ||
+    username === '';
+  return (
+    <form onSubmit={onSubmit}>
+      <input
+        name="username"
+        value={username}
+        onChange={(e: React.SyntheticEvent) => {
+          let target = e.target as HTMLInputElement;
+          return onChangeUsername(target.value)
+        }}
+        type="text"
+        placeholder="Full Name"
+      />
+      <input
+        name="email"
+        value={email}
+        onChange={(e: React.SyntheticEvent) => {
+          let target = e.target as HTMLInputElement;
+          return onChangeEmail(target.value)
+        }}
+        type="text"
+        placeholder="Email Address"
+      />
+      <input
+        name="passwordOne"
+        value={passwordOne}
+        onChange={(e: React.SyntheticEvent) => {
+          let target = e.target as HTMLInputElement;
+          return onChangePasswordOne(target.value)
+        }}
+        type="password"
+        placeholder="Password"
+      />
+      <input
+        name="passwordTwo"
+        value={passwordTwo}
+        onChange={(e: React.SyntheticEvent) => {
+          let target = e.target as HTMLInputElement;
+          return onChangePasswordTwo(target.value)
+        }}
+        type="password"
+        placeholder="Confirm Password"
+      />
+      <button disabled={isInvalid} type="submit">
+        Sign Up
+      </button>
+      {error && <p>{error.message}</p>}
+    </form>
+  )
+};
 
 const SignUpLink = () => (
   <p>
