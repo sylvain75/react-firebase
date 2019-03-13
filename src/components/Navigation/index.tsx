@@ -5,13 +5,19 @@ import SignOutButton from '../SignOut';
 import * as ROUTES from '../../constants/routes';
 import * as firebase from 'firebase';
 
-type Props = {
-  authUser: null | firebase.auth.UserCredential
-}
+import { AuthUserContext } from '../Session';
+import { AuthUser } from '../Firebase/firebase';
 
-const Navigation = ({ authUser }: Props) => (
-  <div>{authUser ? <NavigationAuth /> : <NavigationNonAuth />}</div>
-)
+const Navigation = () => (
+  <div>
+    <AuthUserContext.Consumer>
+      {(authUser: AuthUser | null) =>
+        authUser ? <NavigationAuth /> : <NavigationNonAuth />
+      }
+    </AuthUserContext.Consumer>
+  </div>
+);
+
 const NavigationAuth = () => (
   <ul>
     <li>

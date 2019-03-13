@@ -15,27 +15,29 @@ import SignInPage from '../SignIn';
 import * as ROUTES from '../../constants/routes';
 import { withFirebase } from '../Firebase';
 import Firebase, { AuthUser } from '../Firebase/firebase';
+import { AuthUserContext } from '../Session';
+import withAuthentication from '../Session/withAuthentication';
 
 type Props = {
   firebase: Firebase
 }
 
-const AppBase = ({firebase}: Props) => {
-  const [authUser, setUser] = useState<AuthUser | null>(null);
-  useEffect(() => {
-    const listener: () => void = firebase.auth.onAuthStateChanged((authUser: any) => {
-      // authUser: any should be AuthUser|null but it throws a warning
-      console.log('authUser HERE AppBase', authUser);
-      !!authUser
-      ? setUser(authUser)
-      : setUser(null)
-    });
-    return listener; // === ComponentWillUnmount activation: takes a function to run when un-mounting component
-  }, []);
+const AppBase = () => {
+  // const [authUser, setUser] = useState<AuthUser | null>(null);
+  // useEffect(() => {
+  //   const listener: () => void = firebase.auth.onAuthStateChanged((authUser: any) => {
+  //     // authUser: any should be AuthUser|null but it throws a warning
+  //     console.log('authUser HERE AppBase', authUser);
+  //     !!authUser
+  //     ? setUser(authUser)
+  //     : setUser(null)
+  //   });
+  //   return listener; // === ComponentWillUnmount activation: takes a function to run when un-mounting component
+  // }, []);
   return (
     <Router>
       <div>
-        <Navigation authUser={authUser}/>
+        <Navigation />
 
         <hr />
 
@@ -51,7 +53,7 @@ const AppBase = ({firebase}: Props) => {
 };
 
 const App = compose(
-  withFirebase,
+  withAuthentication,
 )(AppBase);
 
 export default App;

@@ -24,8 +24,8 @@ type Props = {
   history: any
 }
 const INITIAL_STATE: State = {
-  email: '',
-  password: '',
+  email: 'sylvain75004+13@hotmail.com',
+  password: 'test1234',
   error: null,
 };
 
@@ -50,6 +50,7 @@ const SignInFormBase = ({firebase, history}: Props) => {
     event.preventDefault();
     try {
       const userAuth = await firebase.doSignInWithEmailAndPassword(email, password);
+      console.log('userAuth HERE', userAuth);
       setState({ ...INITIAL_STATE });
       history.push(ROUTES.HOME);
     } catch(error) {
