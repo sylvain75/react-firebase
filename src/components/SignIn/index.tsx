@@ -5,6 +5,7 @@ import { compose } from 'recompose';
 import { SignUpLink } from '../SignUp';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
+import { IFirebase } from '../Firebase/firebase';
 
 const SignInPage = () => (
   <div>
@@ -19,7 +20,7 @@ type State = {
   error: null | Error
 }
 type Props = {
-  firebase: any,
+  firebase: IFirebase,
   history: any
 }
 const INITIAL_STATE: State = {
