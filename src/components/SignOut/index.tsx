@@ -12,7 +12,7 @@ const signOut = async(firebase: IFirebase) => {
   } catch(error) {
     console.log('error signOut:', error);
   }
-}
+};
 
 const SignOutButton = ({ firebase }: Props) => (
   <button type="button" onClick={() => signOut(firebase)}>
