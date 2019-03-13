@@ -10,7 +10,7 @@ const config = {
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
 };
-
+export type AuthUser = firebase.auth.UserCredential;
 export interface IFirebase {
   doCreateUserWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
   doSignInWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
