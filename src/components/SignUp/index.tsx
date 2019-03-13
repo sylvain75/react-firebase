@@ -22,14 +22,14 @@ type State = {
   email: string,
   passwordOne: string,
   passwordTwo: string,
-  error: null | any,
+  error: null | Error,
 }
 const INITIAL_STATE: State = {
   username: '',
   email: '',
   passwordOne: '',
   passwordTwo: '',
-  error: Error,
+  error: null,
 };
 
 const SignUpFormBase = ({firebase, history}: Props) => {

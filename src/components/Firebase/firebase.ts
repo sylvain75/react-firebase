@@ -13,7 +13,7 @@ const config = {
 
 export interface IFirebase {
   doCreateUserWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
-  doSignInWithEmailAndPassword: (email: string, password: string) => void,
+  doSignInWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
   doPasswordReset: (email: string) => void,
   doPasswordUpdate: (password: string) => void,
   doSignOut: () => void,
