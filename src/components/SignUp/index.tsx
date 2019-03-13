@@ -1,9 +1,11 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+// import { History } from 'history';
 import { compose } from 'recompose';
 
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
+import { IFirebase } from '../Firebase/firebase';
 
 const SignUpPage = () => (
   <div>
@@ -12,7 +14,8 @@ const SignUpPage = () => (
   </div>
 );
 type Props = {
-
+  firebase: IFirebase,
+  history: any //TODO type history => error with History as type
 }
 type State = {
   username: string,
@@ -29,28 +32,36 @@ const INITIAL_STATE: State = {
   error: Error,
 };
 
-const SignUpFormBase = (props: any) => {
-  const [username, onChangeUsername] = useState("");
-  const [email, onChangeEmail] = useState("");
-  const [passwordOne, onChangePasswordOne] = useState("");
-  const [passwordTwo, onChangePasswordTwo] = useState("");
-  const [error, setError] = useState<Error | null>(null);
-  const [initialState, resetState] = useState();
-  const onSubmit = (event: React.SyntheticEvent) => {
-    props.firebase
-      .doCreateUserWithEmailAndPassword(email, passwordOne)
-      .then((authUser: any) => {
-        console.log('authUser HERE', authUser);
-        resetState(INITIAL_STATE);
-        console.log('onChangeEmail HERE',initialState, email);
-        props.history.push(ROUTES.HOME);
-      })
-      .catch((error: Error) => {
-        setError(error);
-      });
+const SignUpFormBase = ({firebase, history}: Props) => {
+  const [
+    { username, email, passwordOne, passwordTwo, error },
+    setState
+  ] = useState(INITIAL_STATE);
 
-    event.preventDefault();
+  const clearState = () => {
+    setState({ ...INITIAL_STATE });
   };
+
+  const onChange = (e: React.SyntheticEvent) => {
+    let target = e.target as HTMLInputElement;
+    const { name, value } = target;
+    setState(prevState => ({ ...prevState, [name]: value }));
+  };
+  const setError = (error: Error) => {
+    setState(prevState => ({ ...prevState, error }));
+  };
+
+  const onSubmit = async(event: React.SyntheticEvent) => {
+    event.preventDefault();
+    try {
+      const authUser = await firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
+      clearState();
+      history.push(ROUTES.HOME);
+    } catch(error) {
+      setError(error);
+    }
+  };
+
   const isInvalid: boolean =
     passwordOne !== passwordTwo ||
     passwordOne === '' ||
@@ -61,40 +72,28 @@ const SignUpFormBase = (props: any) => {
       <input
         name="username"
         value={username}
-        onChange={(e: React.SyntheticEvent) => {
-          let target = e.target as HTMLInputElement;
-          return onChangeUsername(target.value)
-        }}
+        onChange={onChange}
         type="text"
         placeholder="Full Name"
       />
       <input
         name="email"
         value={email}
-        onChange={(e: React.SyntheticEvent) => {
-          let target = e.target as HTMLInputElement;
-          return onChangeEmail(target.value)
-        }}
+        onChange={onChange}
         type="text"
         placeholder="Email Address"
       />
       <input
         name="passwordOne"
         value={passwordOne}
-        onChange={(e: React.SyntheticEvent) => {
-          let target = e.target as HTMLInputElement;
-          return onChangePasswordOne(target.value)
-        }}
+        onChange={onChange}
         type="password"
         placeholder="Password"
       />
       <input
         name="passwordTwo"
         value={passwordTwo}
-        onChange={(e: React.SyntheticEvent) => {
-          let target = e.target as HTMLInputElement;
-          return onChangePasswordTwo(target.value)
-        }}
+        onChange={onChange}
         type="password"
         placeholder="Confirm Password"
       />
@@ -111,10 +110,12 @@ const SignUpLink = () => (
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
   </p>
 );
+
 const SignUpForm = compose(
   withRouter,
   withFirebase,
 )(SignUpFormBase);
+// INFO: compose avoid double HOC encapsulating withRouter(withFirebase(SignupFormBase))
 
 export default SignUpPage;
 

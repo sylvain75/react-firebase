@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import * as firebase from 'firebase';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -11,7 +12,7 @@ const config = {
 };
 
 export interface IFirebase {
-  doCreateUserWithEmailAndPassword: (email: string, password: string) => void,
+  doCreateUserWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
   doSignInWithEmailAndPassword: (email: string, password: string) => void,
   doPasswordReset: (email: string) => void,
   doPasswordUpdate: (password: string) => void,
