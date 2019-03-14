@@ -14,9 +14,9 @@ export type AuthUser = firebase.auth.UserCredential;
 export interface IFirebase {
   doCreateUserWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
   doSignInWithEmailAndPassword: (email: string, password: string) => Promise<firebase.auth.UserCredential>,
-  doPasswordReset: (email: string) => void,
+  doPasswordReset: (email: string) => Promise<void>,
   doPasswordUpdate: (password: string) => void,
-  doSignOut: () => void,
+  doSignOut: () => Promise<void>,
 }
 class Firebase implements IFirebase{
   auth: any

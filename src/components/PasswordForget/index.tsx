@@ -1,40 +1,31 @@
 import React, { useState } from 'react';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'recompose';
+import { Link } from 'react-router-dom';
 
-import { SignUpLink } from '../SignUp';
-import { PasswordForgetLink } from '../PasswordForget';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
 import { IFirebase } from '../Firebase/firebase';
 
-const SignInPage = () => (
+const PasswordForgetPage = () => (
   <div>
-    <h1>SignIn</h1>
-    <SignInForm />
-    <SignUpLink />
-    <PasswordForgetLink />
+    <h1>PasswordForget</h1>
+    <PasswordForgetForm />
   </div>
 );
 type State = {
   email: string,
-  password: string,
-  error: null | Error
+  error: Error | null,
 }
 type Props = {
-  firebase: IFirebase,
-  history: any
+  firebase: IFirebase
 }
 const INITIAL_STATE: State = {
-  email: 'sylvain75004+13@hotmail.com',
-  password: 'test1234',
+  email: '',
   error: null,
 };
 
-
-const SignInFormBase = ({firebase, history}: Props) => {
+const PasswordForgetFormBase = ({ firebase }: Props) => {
   const [
-    { email, password, error },
+    { email, error },
     setState
   ] = useState(INITIAL_STATE);
 
@@ -51,16 +42,13 @@ const SignInFormBase = ({firebase, history}: Props) => {
   const onSubmit = async(event: React.SyntheticEvent) => {
     event.preventDefault();
     try {
-      const userAuth = await firebase.doSignInWithEmailAndPassword(email, password);
-      console.log('userAuth HERE', userAuth);
+      const userAuth = await firebase.doPasswordReset(email);
       setState({ ...INITIAL_STATE });
-      history.push(ROUTES.HOME);
     } catch(error) {
       setError(error);
     }
   };
-
-  const isInvalid = password === '' || email === '';
+  const isInvalid: boolean = email === '';
   return (
     <form onSubmit={onSubmit}>
       <input
@@ -70,27 +58,23 @@ const SignInFormBase = ({firebase, history}: Props) => {
         type="text"
         placeholder="Email Address"
       />
-      <input
-        name="password"
-        value={password}
-        onChange={onChange}
-        type="password"
-        placeholder="Password"
-      />
       <button disabled={isInvalid} type="submit">
-        Sign In
+        Reset My Password
       </button>
 
       {error && <p>{error.message}</p>}
     </form>
   );
-}
+};
 
-const SignInForm = compose(
-  withRouter,
-  withFirebase,
-)(SignInFormBase);
+const PasswordForgetLink = () => (
+  <p>
+    <Link to={ROUTES.PASSWORD_FORGET}>Forgot Password?</Link>
+  </p>
+);
 
-export default SignInPage;
+export default PasswordForgetPage;
 
-export { SignInForm };
+const PasswordForgetForm = withFirebase(PasswordForgetFormBase);
+
+export { PasswordForgetForm, PasswordForgetLink };
