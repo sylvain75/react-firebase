@@ -12,7 +12,7 @@ const withAuthentication = (Component: any) => {
   const withAuthenticationListener = (props: Props) => {
     const [authUser, setUser] = useState<AuthUser | null>(null);
     useEffect(() => {
-      const listener: () => void = props.firebase.auth.onAuthStateChanged((authUser: any) => {
+      const listener: () => void = props.firebase.auth.onAuthStateChanged((authUser: AuthUser | null) => {
         // authUser: any should be AuthUser|null but it throws a warning
         console.log('authUser HERE AppBase', authUser);
         !!authUser
@@ -26,7 +26,7 @@ const withAuthentication = (Component: any) => {
         <Component {...props} />
       </AuthUserContext.Provider>
     );
-  }
+  };
   return withFirebase(withAuthenticationListener);
 };
 

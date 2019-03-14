@@ -6,7 +6,7 @@ import { SignUpLink } from '../SignUp';
 import { PasswordForgetLink } from '../PasswordForget';
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
-import { IFirebase } from '../Firebase/firebase';
+import { IFirebase, UserCredential } from '../Firebase/firebase';
 
 const SignInPage = () => (
   <div>
@@ -51,8 +51,8 @@ const SignInFormBase = ({firebase, history}: Props) => {
   const onSubmit = async(event: React.SyntheticEvent) => {
     event.preventDefault();
     try {
-      const userAuth = await firebase.doSignInWithEmailAndPassword(email, password);
-      console.log('userAuth HERE', userAuth);
+      const userCredential: UserCredential = await firebase.doSignInWithEmailAndPassword(email, password);
+      console.log('userCredential SIGN_IN', userCredential);
       setState({ ...INITIAL_STATE });
       history.push(ROUTES.HOME);
     } catch(error) {

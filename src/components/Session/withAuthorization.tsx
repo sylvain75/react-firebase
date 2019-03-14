@@ -7,10 +7,10 @@ import * as ROUTES from '../../constants/routes';
 import { AuthUser } from '../Firebase/firebase';
 import AuthUserContext from './context';
 
-const withAuthorization = (condition: any) => (Component: FunctionComponent) => {
+const withAuthorization = (condition: (...args: any) => boolean) => (Component: FunctionComponent) => {
   const withAuthorizationHandler = (props: any) => {
     useEffect(() => {
-      const listener: () => void = props.firebase.auth.onAuthStateChanged((authUser: any) => {
+      const listener: () => void = props.firebase.auth.onAuthStateChanged((authUser: AuthUser | null) => {
         if (!condition(authUser)) {
           props.history.push(ROUTES.SIGN_IN);
         }

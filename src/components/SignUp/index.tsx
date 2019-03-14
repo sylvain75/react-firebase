@@ -5,7 +5,7 @@ import { compose } from 'recompose';
 
 import { withFirebase } from '../Firebase';
 import * as ROUTES from '../../constants/routes';
-import { IFirebase } from '../Firebase/firebase';
+import { IFirebase, UserCredential } from '../Firebase/firebase';
 
 const SignUpPage = () => (
   <div>
@@ -54,7 +54,7 @@ const SignUpFormBase = ({firebase, history}: Props) => {
   const onSubmit = async(event: React.SyntheticEvent) => {
     event.preventDefault();
     try {
-      const authUser = await firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
+      const userCredential: UserCredential = await firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
       clearState();
       history.push(ROUTES.HOME);
     } catch(error) {
