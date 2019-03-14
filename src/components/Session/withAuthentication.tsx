@@ -1,43 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import AuthUserContext from './context';
 import { withFirebase } from '../Firebase';
+import Firebase, { AuthUser } from '../Firebase/firebase';
+
+type Props = {
+  firebase: Firebase
+}
 
 const withAuthentication = (Component: any) => {
-  class WithAuthentication extends React.Component<any, any> {
-    listener: any;
-    constructor(props: any) {
-      super(props);
-
-      this.state = {
-        authUser: null,
-      };
-    }
-
-    componentDidMount() {
-      this.listener = this.props.firebase.auth.onAuthStateChanged(
-        (authUser: any) => {
-          authUser
-            ? this.setState({ authUser })
-            : this.setState({ authUser: null });
-        },
-      );
-    }
-
-    componentWillUnmount() {
-      this.listener();
-    }
-
-    render() {
-      return (
-        <AuthUserContext.Provider value={this.state.authUser}>
-          <Component {...this.props} />
-        </AuthUserContext.Provider>
-      );
-    }
+  const withAuthenticationListener = (props: Props) => {
+    const [authUser, setUser] = useState<AuthUser | null>(null);
+    useEffect(() => {
+      const listener: () => void = props.firebase.auth.onAuthStateChanged((authUser: any) => {
+        // authUser: any should be AuthUser|null but it throws a warning
+        console.log('authUser HERE AppBase', authUser);
+        !!authUser
+        ? setUser(authUser)
+        : setUser(null)
+      });
+      return listener; // === ComponentWillUnmount activation: return a function to run when un-mounting component
+    }, []);
+    return (
+      <AuthUserContext.Provider value={authUser}>
+        <Component {...props} />
+      </AuthUserContext.Provider>
+    );
   }
-
-  return withFirebase(WithAuthentication);
+  return withFirebase(withAuthenticationListener);
 };
 
 export default withAuthentication;

@@ -13,47 +13,34 @@ import SignInPage from '../SignIn';
 // import AdminPage from '../Admin';
 
 import * as ROUTES from '../../constants/routes';
-import { withFirebase } from '../Firebase';
-import Firebase, { AuthUser } from '../Firebase/firebase';
-import { AuthUserContext } from '../Session';
 import withAuthentication from '../Session/withAuthentication';
+import SignUpPage from '../SignUp';
 
-type Props = {
-  firebase: Firebase
-}
 
-const AppBase = () => {
-  // const [authUser, setUser] = useState<AuthUser | null>(null);
-  // useEffect(() => {
-  //   const listener: () => void = firebase.auth.onAuthStateChanged((authUser: any) => {
-  //     // authUser: any should be AuthUser|null but it throws a warning
-  //     console.log('authUser HERE AppBase', authUser);
-  //     !!authUser
-  //     ? setUser(authUser)
-  //     : setUser(null)
-  //   });
-  //   return listener; // === ComponentWillUnmount activation: takes a function to run when un-mounting component
-  // }, []);
-  return (
-    <Router>
-      <div>
-        <Navigation />
+const AppBase = () => (
+  <Router>
+    <div>
+      <Navigation />
 
-        <hr />
+      <hr />
 
-        <Route exact path={ROUTES.LANDING} component={LandingPage} />
-        <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-        {/*<Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />*/}
-        {/*<Route path={ROUTES.HOME} component={HomePage} />*/}
-        {/*<Route path={ROUTES.ACCOUNT} component={AccountPage} />*/}
-        {/*<Route path={ROUTES.ADMIN} component={AdminPage} />*/}
-      </div>
-    </Router>
-  );
-};
+      <Route exact path={ROUTES.LANDING} component={LandingPage} />
+      <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+      <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+      {/*<Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />*/}
+      {/*<Route path={ROUTES.HOME} component={HomePage} />*/}
+      {/*<Route path={ROUTES.ACCOUNT} component={AccountPage} />*/}
+      {/*<Route path={ROUTES.ADMIN} component={AdminPage} />*/}
+    </div>
+  </Router>
+);
 
 const App = compose(
   withAuthentication,
 )(AppBase);
+/*
+  withAuthentication is the higher-order component to make the authenticated user available
+  for all other components below of the App component
+ */
 
 export default App;

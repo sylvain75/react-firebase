@@ -1,22 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 
-import SignOutButton from '../SignOut';
-import * as ROUTES from '../../constants/routes';
-import * as firebase from 'firebase';
+import SignOutButton from "../SignOut";
+import * as ROUTES from "../../constants/routes";
 
-import { AuthUserContext } from '../Session';
-import { AuthUser } from '../Firebase/firebase';
+import { AuthUserContext } from "../Session";
+import { AuthUser } from "../Firebase/firebase";
 
-const Navigation = () => (
-  <div>
-    <AuthUserContext.Consumer>
-      {(authUser: AuthUser | null) =>
-        authUser ? <NavigationAuth /> : <NavigationNonAuth />
-      }
-    </AuthUserContext.Consumer>
-  </div>
-);
+const Navigation = () => {
+  const authUser: AuthUser | null = useContext(AuthUserContext);
+  return <div>{authUser ? <NavigationAuth /> : <NavigationNonAuth />}</div>;
+};
 
 const NavigationAuth = () => (
   <ul>
