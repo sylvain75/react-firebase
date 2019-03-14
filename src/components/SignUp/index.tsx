@@ -25,10 +25,10 @@ type State = {
   error: null | Error,
 }
 const INITIAL_STATE: State = {
-  username: '',
-  email: '',
-  passwordOne: '',
-  passwordTwo: '',
+  username: 'syl della',
+  email: 'sylvain75004+52@hotmail.com',
+  passwordOne: 'ttest1234',
+  passwordTwo: 'ttest1234',
   error: null,
 };
 
@@ -55,6 +55,12 @@ const SignUpFormBase = ({firebase, history}: Props) => {
     event.preventDefault();
     try {
       const userCredential: UserCredential = await firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
+        // Create a user in your Firebase realtime database
+      if (userCredential && userCredential.user) {
+        // const resUSERDB = await firebase.user(userCredential.user.uid).set({ username, email, });
+        const resUSERDB = await firebase.user().add({ username, email, });
+        console.log(' HERE, resUSERDB', resUSERDB);
+      }
       clearState();
       history.push(ROUTES.HOME);
     } catch(error) {

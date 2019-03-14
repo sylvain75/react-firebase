@@ -1,5 +1,6 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
 import * as firebase from 'firebase';
 
 const config = {
@@ -18,12 +19,16 @@ export interface IFirebase {
   doPasswordReset: (email: string) => Promise<void>,
   doPasswordUpdate: (password: string) => void,
   doSignOut: () => Promise<void>,
+  user: () => any,
+  users: () => void,
 }
 class Firebase implements IFirebase{
-  auth: any
+  auth: any;
+  db: any;
   constructor() {
     app.initializeApp(config);
     this.auth = app.auth();
+    this.db = app.firestore();
   }
 
   // *** Auth API ***
@@ -39,6 +44,17 @@ class Firebase implements IFirebase{
 
   doPasswordUpdate = (password: string) =>
     this.auth.currentUser.updatePassword(password);
+
+  // *** User API ***
+  // db.collection("users").add({
+  //                              first: "Ada",
+  //                              last: "Lovelace",
+  //                              born: 1815
+  //                            })
+  user = () => this.db.collection(`users`);
+  // user = (uid: string) => this.db.ref(`users/${uid}`);
+
+  users = () => this.db.ref('users');
 }
 
 export default Firebase;
