@@ -19,8 +19,8 @@ export interface IFirebase {
   doPasswordReset: (email: string) => Promise<void>,
   doPasswordUpdate: (password: string) => void,
   doSignOut: () => Promise<void>,
-  user: () => any,
-  users: () => void,
+  user: () => firebase.firestore.CollectionReference,
+  users: () => firebase.firestore.CollectionReference,
 }
 class Firebase implements IFirebase{
   auth: any;
@@ -46,15 +46,9 @@ class Firebase implements IFirebase{
     this.auth.currentUser.updatePassword(password);
 
   // *** User API ***
-  // db.collection("users").add({
-  //                              first: "Ada",
-  //                              last: "Lovelace",
-  //                              born: 1815
-  //                            })
-  user = () => this.db.collection(`users`);
-  // user = (uid: string) => this.db.ref(`users/${uid}`);
+  user = () => this.db.collection('users');
 
-  users = () => this.db.ref('users');
+  users = () => this.db.collection('users');
 }
 
 export default Firebase;

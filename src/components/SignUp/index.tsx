@@ -58,7 +58,7 @@ const SignUpFormBase = ({firebase, history}: Props) => {
         // Create a user in your Firebase realtime database
       if (userCredential && userCredential.user) {
         // const resUSERDB = await firebase.user(userCredential.user.uid).set({ username, email, });
-        const resUSERDB = await firebase.user().add({ username, email, });
+        const resUSERDB = await firebase.user().add({ username, email });
         console.log(' HERE, resUSERDB', resUSERDB);
       }
       clearState();
