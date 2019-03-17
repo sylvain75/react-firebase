@@ -4,8 +4,9 @@ import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
 import { withFirebase } from '../Firebase';
-import * as ROUTES from '../../constants/routes';
 import { IFirebase, UserCredential } from '../Firebase/firebase';
+import * as ROUTES from '../../constants/routes';
+import * as ROLES from '../../constants/roles';
 
 const SignUpPage = () => (
   <div>
@@ -22,6 +23,7 @@ type State = {
   email: string,
   passwordOne: string,
   passwordTwo: string,
+  isAdmin: boolean,
   error: null | Error,
 }
 const INITIAL_STATE: State = {
@@ -29,12 +31,13 @@ const INITIAL_STATE: State = {
   email: 'sylvain75004+52@hotmail.com',
   passwordOne: 'ttest1234',
   passwordTwo: 'ttest1234',
+  isAdmin: false,
   error: null,
 };
 
 const SignUpFormBase = ({firebase, history}: Props) => {
   const [
-    { username, email, passwordOne, passwordTwo, error },
+    { username, email, passwordOne, passwordTwo, isAdmin, error },
     setState
   ] = useState(INITIAL_STATE);
 
@@ -47,19 +50,32 @@ const SignUpFormBase = ({firebase, history}: Props) => {
     const { name, value } = target;
     setState(prevState => ({ ...prevState, [name]: value }));
   };
+  const onChangeCheckbox = (e: React.SyntheticEvent) => {
+    let target = e.target as HTMLInputElement;
+    const { name, checked } = target;
+    setState(prevState => ({ ...prevState, [name]: checked }));
+  };
   const setError = (error: Error) => {
     setState(prevState => ({ ...prevState, error }));
   };
 
   const onSubmit = async(event: React.SyntheticEvent) => {
     event.preventDefault();
+    const roles = [];
+    if (isAdmin) {
+      roles.push(ROLES.ADMIN);
+    }
     try {
       const userCredential: UserCredential = await firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
-        // Create a user in your Firebase realtime database
       if (userCredential && userCredential.user) {
-        // const resUSERDB = await firebase.user(userCredential.user.uid).set({ username, email, });
-        const resUSERDB = await firebase.user().add({ username, email });
-        console.log(' HERE, resUSERDB', resUSERDB);
+        /* Create a user in your Firestore
+           Pass userCredential.uid as reference to firestore db
+         */
+        const res = await firebase.users().doc(userCredential.user.uid).set({ username, email, roles });
+        /*
+        Behind the scenes, .add(...) and .doc().set(...) are completely equivalent,
+        so you can use whichever is more convenient.
+         */
       }
       clearState();
       history.push(ROUTES.HOME);
@@ -103,6 +119,15 @@ const SignUpFormBase = ({firebase, history}: Props) => {
         type="password"
         placeholder="Confirm Password"
       />
+      <label>
+        Admin:
+        <input
+          name="isAdmin"
+          type="checkbox"
+          checked={isAdmin}
+          onChange={onChangeCheckbox}
+        />
+      </label>
       <button disabled={isInvalid} type="submit">
         Sign Up
       </button>
