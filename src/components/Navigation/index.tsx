@@ -3,16 +3,21 @@ import { Link } from "react-router-dom";
 
 import SignOutButton from "../SignOut";
 import * as ROUTES from "../../constants/routes";
+import * as ROLES from '../../constants/roles';
 
 import { AuthUserContext } from "../Session";
-import { AuthUser } from "../Firebase/firebase";
+import { AuthUser, MergedUserWithUserDb } from '../Firebase/firebase';
+
+type PropNavigationAuth = {
+  authUser: MergedUserWithUserDb
+}
 
 const Navigation = () => {
-  const authUser: AuthUser | null = useContext(AuthUserContext);
-  return <div>{authUser ? <NavigationAuth /> : <NavigationNonAuth />}</div>;
+  const authUser: MergedUserWithUserDb | null = useContext(AuthUserContext);
+  return <div>{authUser ? <NavigationAuth authUser={authUser}/> : <NavigationNonAuth />}</div>;
 };
 
-const NavigationAuth = () => (
+const NavigationAuth = ({ authUser }: PropNavigationAuth) => (
   <ul>
     <li>
       <Link to={ROUTES.LANDING}>Landing</Link>
@@ -23,9 +28,11 @@ const NavigationAuth = () => (
     <li>
       <Link to={ROUTES.ACCOUNT}>Account</Link>
     </li>
-    <li>
-      <Link to={ROUTES.ADMIN}>Admin</Link>
-    </li>
+    {authUser.roles.includes(ROLES.ADMIN) && (
+      <li>
+        <Link to={ROUTES.ADMIN}>Admin</Link>
+      </li>
+    )}
     <li>
       <SignOutButton />
     </li>

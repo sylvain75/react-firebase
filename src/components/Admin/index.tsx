@@ -15,8 +15,10 @@
 // export default withAuthorization(condition)(AdminPage);
 
 // PROTOTYPE ABOVE
-
-import { IFirebase } from '../Firebase/firebase';
+import { compose } from 'recompose';
+import { AuthUser, IFirebase, MergedUserWithUserDb } from '../Firebase/firebase';
+import { withAuthorization } from '../Session';
+import * as ROLES from '../../constants/roles';
 
 type Props = {
   firebase: IFirebase
@@ -32,7 +34,8 @@ type UserInfo = {
   username: string,
 }
 type UserListProps = {
-  users: UserInfo[]
+  users: UserInfo[],
+  isLoading: boolean
 }
 
 import React, { useEffect, useState } from 'react';
@@ -40,26 +43,32 @@ import React, { useEffect, useState } from 'react';
 import { withFirebase } from '../Firebase';
 import * as firebaseType from 'firebase';
 
-const UsersList = ({ users }: UserListProps) => (
-  <React.Fragment>
-    <h3>Users list:</h3>
-    <ul>
-      {users.map((user: UserInfo) => (
-        <li key={user.uid}>
-          <span>
-            <strong>ID:</strong> {user.uid}
-          </span>
-          <span style={{marginLeft: "10px", marginRight: '10px'}}>
-            <strong>E-Mail:</strong> {user.email}
-          </span>
-          <span>
-            <strong>Username:</strong> {user.username}
-          </span>
-        </li>
-      ))}
-    </ul>
-  </React.Fragment>
-);
+const UsersList = ({ users, isLoading }: UserListProps) => {
+  if (isLoading) {
+    return <div><h1>...LOADING</h1></div>
+  } else {
+    return (
+      <React.Fragment>
+        <h3>Users list:</h3>
+        <ul>
+          {users.map((user: UserInfo) => (
+            <li key={user.uid}>
+              <span>
+                <strong>ID:</strong> {user.uid}
+              </span>
+              <span style={{marginLeft: "10px", marginRight: '10px'}}>
+                <strong>E-Mail:</strong> {user.email}
+              </span>
+              <span>
+                <strong>Username:</strong> {user.username}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </React.Fragment>
+    )
+  }
+};
 
 const AdminPage = ({firebase}: Props) => {
   const [isLoading, setLoading] = useState<State['loading']>(false);
@@ -97,16 +106,25 @@ const AdminPage = ({firebase}: Props) => {
     /* May need to return a function to clear eventual listener
      */
   }, []);
-  if (isLoading) {
-    return <div><h1>...LOADING</h1></div>
-  }
+
   return (
     <div>
       <h1>Admin</h1>
+      <p>
+        The Admin Page is accessible by every signed in admin user.
+      </p>
       {error && <p>{error.message}</p>}
-      {users.length > 0 && <UsersList users={users}/>}
+      {<UsersList users={users} isLoading={isLoading}/>}
     </div>
   );
 };
 
-export default withFirebase(AdminPage);
+const condition = (authUser: MergedUserWithUserDb) =>
+  authUser && authUser.roles.includes(ROLES.ADMIN);
+
+export default compose(
+  withAuthorization(condition),
+  withFirebase,
+)(AdminPage);
+
+// export default withFirebase(AdminPage);

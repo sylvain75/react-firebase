@@ -11,32 +11,14 @@ import * as firebaseType from 'firebase';
 const withAuthorization = (condition: (...args: any) => boolean) => (Component: FunctionComponent) => {
   const withAuthorizationHandler = (props: any) => {
     useEffect(() => {
-      const listener: () => void = props.firebase.auth.onAuthStateChanged(async(authUser: any | null) => {
-        // authUser: any could be AuthUser but it gets merged with dbUser later
-        if (authUser) {
-          console.log('authUser HERE', authUser);
-          const userDoc: firebaseType.firestore.DocumentSnapshot = await props.firebase.user(authUser.uid)
-            .doc(authUser.uid)
-            .get();
-          const dbUser: firebaseType.firestore.DocumentData | undefined = userDoc.data();
-          // default empty roles
-          if (dbUser && !dbUser.roles) {
-            dbUser.roles = [];
-          }
-          // merge auth and db user
-           authUser = {
-            uid: authUser.uid,
-            email: authUser.email,
-            ...dbUser,
-          };
-          console.log('authUser ENNNND HERE', authUser);
+      const listener: () => void = props.firebase.onAuthUserListener(
+        (authUser: any) => {
           if (!condition(authUser)) {
             props.history.push(ROUTES.SIGN_IN);
           }
-        } else {
-          props.history.push(ROUTES.SIGN_IN);
-        }
-      });
+        },
+        () => props.history.push(ROUTES.SIGN_IN),
+      );
       return listener; // === ComponentWillUnmount activation: return a function to run when un-mounting component
     }, []);
     const authUser: AuthUser | null = useContext(AuthUserContext);
