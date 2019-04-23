@@ -16,12 +16,19 @@
 
 // PROTOTYPE ABOVE
 import { compose } from 'recompose';
+import { Switch, Route, Link } from 'react-router-dom';
+
 import { AuthUser, IFirebase, MergedUserWithUserDb } from '../Firebase/firebase';
 import { withAuthorization } from '../Session';
 import * as ROLES from '../../constants/roles';
+import * as ROUTES from '../../constants/routes';
 
-type Props = {
+type UserListBaseProps = {
   firebase: IFirebase
+}
+type UserItemProps = {
+  firebase: IFirebase
+  match: any
 }
 type State = {
   loading: boolean,
@@ -43,34 +50,7 @@ import React, { useEffect, useState } from 'react';
 import { withFirebase } from '../Firebase';
 import * as firebaseType from 'firebase';
 
-const UsersList = ({ users, isLoading }: UserListProps) => {
-  if (isLoading) {
-    return <div><h1>...LOADING</h1></div>
-  } else {
-    return (
-      <React.Fragment>
-        <h3>Users list:</h3>
-        <ul>
-          {users.map((user: UserInfo) => (
-            <li key={user.uid}>
-              <span>
-                <strong>ID:</strong> {user.uid}
-              </span>
-              <span style={{marginLeft: "10px", marginRight: '10px'}}>
-                <strong>E-Mail:</strong> {user.email}
-              </span>
-              <span>
-                <strong>Username:</strong> {user.username}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </React.Fragment>
-    )
-  }
-};
-
-const AdminPage = ({firebase}: Props) => {
+const UserListBase = ({ firebase }: UserListBaseProps) => {
   const [isLoading, setLoading] = useState<State['loading']>(false);
   const [users, setUserList] = useState<State['users']>([]);
   const [error, setError] = useState<State['error']>(null);
@@ -106,15 +86,60 @@ const AdminPage = ({firebase}: Props) => {
     /* May need to return a function to clear eventual listener
      */
   }, []);
+  if (isLoading) {
+    return <div><h1>...LOADING</h1></div>
+  } else {
+    return (
+      <React.Fragment>
+        <h3>Users list:</h3>
+        <ul>
+          {users.map((user: UserInfo) => (
+            <li key={user.uid}>
+              <span>
+                <strong>ID:</strong> {user.uid}
+              </span>
+              <span style={{marginLeft: "10px", marginRight: '10px'}}>
+                <strong>E-Mail:</strong> {user.email}
+              </span>
+              <span>
+                <strong>Username:</strong> {user.username}
+              </span>
+              <span style={{marginLeft: "10px", marginRight: '10px'}}>
+                <Link to={`${ROUTES.ADMIN}/${user.uid}`}>
+                  Details
+                </Link>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </React.Fragment>
+    )
+  }
+};
+const UserList = withFirebase(UserListBase);
 
+///////////
+const UserItemBase = ({ match, firebase }: UserItemProps) => {
+  // location, match, history are passed as props with <Route> wrapping UserItem
+  return (
+  <div>
+    <h2>User ({match.params.id})</h2>
+  </div>
+)};
+const UserItem = withFirebase(UserItemBase);
+//////////
+
+const AdminPage = () => {
   return (
     <div>
       <h1>Admin</h1>
       <p>
         The Admin Page is accessible by every signed in admin user.
       </p>
-      {error && <p>{error.message}</p>}
-      {<UsersList users={users} isLoading={isLoading}/>}
+      <Switch>
+        <Route exact path={ROUTES.ADMIN_DETAILS} component={UserItem} />
+        <Route exact path={ROUTES.ADMIN} component={UserList} />
+      </Switch>
     </div>
   );
 };
