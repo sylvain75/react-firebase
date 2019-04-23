@@ -3,7 +3,6 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import * as firebase from 'firebase';
 import * as ROUTES from '../../constants/routes';
-import { log } from 'util';
 import { ADMIN } from '../../constants/roles';
 
 const config = {
